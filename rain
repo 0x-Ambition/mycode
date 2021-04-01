@@ -1,0 +1,117 @@
+/*
+	内容：黑客帝国数字雨
+	日期：2021年3月20日09点35分
+*/
+
+#include<stdio.h>
+#include<graphics.h>//图形库头文件
+//#include<windows.h>
+#define WIDTH 960
+#define HEIGHT 640
+#define STR_SIZE 20
+#define STR_NUM 128
+#define STR_WIDTH 15
+struct Rain
+{
+	int x;//数字雨横向位置
+	int y;//y坐标
+	int speed;//下降速度
+	char str[STR_SIZE];//数字雨数组
+}rain[STR_NUM];
+
+char CreateCh()
+{
+	char temp = 0;
+	int flag = rand() % 3;//0 1 2
+	if (flag == 0)
+	{
+		temp = rand() % 26 + 'a';
+	}
+	else if (flag == 1)
+	{
+		temp = rand() % 26 + 'A';
+	}
+	else
+	{
+		temp = rand() % 10 + '0';
+	}
+	return temp;
+}
+void GameInit()
+{
+	for (int i = 0; i < STR_NUM; i++)
+	{
+		rain[i].x = i * STR_WIDTH;
+		rain[i].y = rand() % HEIGHT;
+		rain[i].speed = rand() % 5 + 5;
+	}
+	for (int i = 0; i < STR_NUM; i++)
+	{
+		for (int j = 0; j < STR_SIZE; j++)
+		{
+			rain[i].str[j] = CreateCh();
+		}
+		
+	}
+}
+void GameDraw()
+{
+	cleardevice();
+	for (int i = 0; i < STR_NUM; i++)
+	{
+		for (int j = 0; j < STR_SIZE; j++)
+		{
+			outtextxy(rain[i].x, rain[i].y-STR_WIDTH*j, rain[i].str[j]);
+			settextcolor(RGB(0, 255 - 13*j, 0));
+		}
+	}
+}
+void GamePlay()
+{
+	for (int i = 0; i < STR_NUM; i++)
+	{
+		rain[i].y += rain[i].speed;
+		if (rain[i].y-STR_SIZE*STR_WIDTH > HEIGHT)
+		{
+			rain[i].y = 0;
+		}
+	}
+}
+void ChangeCh()
+{
+	//改变:遍历数组
+	for (int i = 0; i < STR_NUM;i++)
+	{
+		rain[rand() % STR_NUM].str[rand()%STR_SIZE] = CreateCh();
+	}
+}
+int main()
+{
+	
+	initgraph(WIDTH,HEIGHT);
+	srand(GetTickCount());
+	GameInit();
+	DWORD t1, t2;
+	t1 = t2 = GetTickCount();
+	while (1)
+	{
+		BeginBatchDraw();
+		GameDraw();
+		ChangeCh();
+		if (t2 - t1 > 20)//使单个函数延时
+		{
+			GamePlay();
+			t1 = t2 = GetTickCount();
+		}
+		t2 = GetTickCount();
+		EndBatchDraw();
+		//Sleep(20);//使整个程序延时
+		
+	}
+	
+	getchar();
+	closegraph();
+
+	return 0;
+
+}
